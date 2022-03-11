@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { create } from 'ipfs-http-client';
 import logo from './logo.svg';
 import './App.css';
@@ -7,6 +7,7 @@ import Split from '../ImageHandler/Split';
 function App() {
 
   const [file, setFile] = useState<File>();
+  
   // const pinata = Pinata(pinataKey, pinataSecret);
   const client = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
   
@@ -21,6 +22,7 @@ function App() {
     setFile(fileData);
     image.src = URL.createObjectURL(fileData);
     console.log("width", image.width)
+    
   }
 
   const fileUpload = async () => {
@@ -43,7 +45,7 @@ function App() {
       <input type="file" onChange={handleFileChange} />
       <button onClick={fileUpload}>Upload image</button>
       <img className="nft-image" alt="nft" max-width={100} />
-    
+      
     </div>
   );
 }

@@ -2,10 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './Dashboard/App';
+import Game from './Game/Play';
 import reportWebVitals from './reportWebVitals';
+import { Connector } from './Wallet/Connector';
 
 ReactDOM.render(
   <React.StrictMode>
+    {/* <Connector /> */}
+    <Game />
     <App />
   </React.StrictMode>,
   document.getElementById('root')
