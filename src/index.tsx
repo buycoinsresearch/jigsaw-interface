@@ -9,7 +9,7 @@ import { Connector } from './Wallet/Connector';
 ReactDOM.render(
   <React.StrictMode>
     {/* <Connector /> */}
-    <Game />
+    {/* <Game /> */}
     <App />
   </React.StrictMode>,
   document.getElementById('root')
