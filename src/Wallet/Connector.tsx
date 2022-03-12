@@ -1,7 +1,7 @@
 import { Provider, chain, defaultChains } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
-import { WalletLinkConnector } from 'wagmi/connectors/walletLink'
+// import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+// import { WalletLinkConnector } from 'wagmi/connectors/walletLink'
 
 import { Example } from './Components'
 
@@ -22,18 +22,18 @@ const connectors = ({ chainId }: any) => {
       chains,
       options: { shimDisconnect: true },
     }),
-    new WalletConnectConnector({
-      options: {
-        infuraId,
-        qrcode: true,
-      },
-    }),
-    new WalletLinkConnector({
-      options: {
-        appName: 'My wagmi app',
-        jsonRpcUrl: `${rpcUrl}/${infuraId}`,
-      },
-    }),
+    // new WalletConnectConnector({
+    //   options: {
+    //     infuraId,
+    //     qrcode: true,
+    //   },
+    // }),
+    // new WalletLinkConnector({
+    //   options: {
+    //     appName: 'My wagmi app',
+    //     jsonRpcUrl: `${rpcUrl}/${infuraId}`,
+    //   },
+    // }),
   ]
 }
 

@@ -5,12 +5,15 @@ import App from './Dashboard/App';
 import Game from './Game/Play';
 import reportWebVitals from './reportWebVitals';
 import { Connector } from './Wallet/Connector';
+import { Provider } from 'wagmi';
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <Connector /> */}
-    {/* <Game /> */}
-    <App />
+    <Provider>
+      <Connector />
+      {/* <Game /> */}
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
