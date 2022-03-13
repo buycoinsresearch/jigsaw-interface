@@ -2,18 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './Dashboard/App';
-import Game from './Game/Play';
+import Create from './ImageHandler/Mint';
 import reportWebVitals from './reportWebVitals';
 import { Connector } from './Wallet/Connector';
 import { Provider } from 'wagmi';
+import Jigsaw from './route';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider>
-      <Connector />
+    {/* <Provider> */}
+      {/* <Connector /> */}
       {/* <Game /> */}
-      <App />
-    </Provider>
+      <Jigsaw />
+    {/* </Provider> */}
   </React.StrictMode>,
   document.getElementById('root')
 );
