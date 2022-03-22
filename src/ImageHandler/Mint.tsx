@@ -4,14 +4,13 @@ import 'react-bootstrap';
 import IpfsUpload from '../ImageHandler/IpfsUpload';
 import { NFT } from '../Components/NFT';
 import { sha256 } from 'ethers/lib/utils';
-import { Buffer } from 'buffer';
 import abi from '.././JigsawABI.json';
 import { ethers, Signer } from 'ethers';
 import { create } from 'ipfs-http-client';
+import { Buffer } from 'buffer';
 
-const contractAddress = '0x60adBd2EFb2E65034df80882e1146e82f519A5A2';
+const contractAddress = '0x60adbd2efb2e65034df80882e1146e82f519a5a2';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
-console.log(contract);
 const infuraProvider = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`;
 
 function Create() {
@@ -20,7 +19,12 @@ function Create() {
     const [nftURL, setNftURL] = useState<string>();
     const [nft, setNFT] = useState<NFT[] | undefined>()
     const [imageSize, setImageSize] = useState<{ width: number, height: number }>()
-    const [dimension, setDimension] = useState<{ row: number, column: number}>()
+    const [dimension, setDimension] = useState<{ row: number, column: number}>({
+        row: 2,
+        column: 2,
+    })
+
+    const mint = document.getElementById('mint') as HTMLInputElement;
 
     function toHexString(byteArray: Uint8Array) {
         return Array.from(byteArray, function(byte) {
@@ -28,11 +32,23 @@ function Create() {
         }).join('')
       }
 
+    useEffect(() => {
+        if (file !== undefined && dimension?.column !== 0 && dimension?.row !== 0) {
+            mint.disabled = false;
+        } 
+
+        if (nft !== undefined && nftURL !== undefined) {
+            MintF(nft!, nftURL!);
+        }
+    }, [nft, nftURL, file, dimension])
+
     async function MintF(solution: NFT[], uri: string) {
-        const stringSolution = JSON.stringify(solution)
+        console.log("Minting...");
+        const stringSolution = solution.toString()
         const buffer = Buffer.from(stringSolution);
-        // const hexString = toHexString(buffer);
-        const hash = sha256(buffer);
+        const hexString = "0x" + toHexString(buffer) 
+       
+        const hash = sha256(hexString);
 
         const abiCoder = new ethers.utils.Interface(abi);
         const encodedData = abiCoder.encodeFunctionData("createNFTs", [[hash], [uri]]);
@@ -42,7 +58,7 @@ function Create() {
           const address: string = await window.ethereum.request({
             method: 'eth_requestAccounts',
           })
-          console.log(encodedData);
+          console.log(hash, hexString, buffer);
 
           await window.ethereum.request({
             method: 'eth_sendTransaction' as any,
@@ -59,35 +75,24 @@ function Create() {
 
     function Solution(uri: string, rows: number, columns: number) {
         const image = new Image();
-        image.src = "https://ipfs.io/ipfs/QmPqfWBWF2YduKpta3kUSkfC6Bk7cidBJoVuhWprRsNCjo";
+        image.src = uri;
         image.onload = () => {
-            setImageSize({ width: image.width, height: image.height })
-            setNFT(
-                Array.from(Array(rows * columns).keys())
-                    .map(position => ({
-                        correctPosition: position,
-                        tileHeight: 1000 / rows,
-                        tileWidth: 1000 / columns,
-                        tileOffsetX: (position % columns) * (1000 / columns),
-                        tileOffsetY: Math.floor(position / columns) * (1000 / rows),
-                        solved: true
-                    }))
-            )
-                }
-            const sortedSolution: NFT[] = nft!.sort((a,b) => {
-            if (a.correctPosition < b.correctPosition) {
-                return -1
-            } else if (a.correctPosition > b.correctPosition) {
-                return 1
-            }
-            return 0
-        })
-        // }
-        if (nft) {
-            console.log(nft);
-        }
+            console.log(image.width, image.height);
+                setImageSize({ width: image.width, height: image.height })
+                setNFT(
+                    Array.from(Array(rows * columns).keys())
+                        .map(position => ({
+                            correctPosition: position,
+                            tileHeight: image.height / rows,
+                            tileWidth: image.width / columns,
+                            tileOffsetX: (position % columns) * (image.width / columns),
+                            tileOffsetY: Math.floor(position / columns) * (image.height / rows),
+                            solved: true
+                        }))
+                )
 
-        return sortedSolution;
+            }
+        
     }
     
     const handleFileChange = (e: any) => {
@@ -101,6 +106,7 @@ function Create() {
     }
 
     const fileUpload = async () => {
+        console.log("Uploading...");
         if(file != null) {
             // const CUD = await IpfsUpload(file);
             const CID = await client.add(file);
@@ -117,14 +123,15 @@ function Create() {
                 ]
             })
 
-            setNftURL(url);
+            
             console.log(url)
             
-            const solution = Solution(url!, dimension!.row, dimension!.column)!
+            Solution(url!, dimension!.row, dimension!.column)!
 
             const metadataCID = await client.add(metadata);
             const metedataURL = `https://ipfs.io/ipfs/${metadataCID.cid.toString()}`
-            MintF(solution!, metedataURL);
+            setNftURL(metedataURL);
+            // MintF(solution!, metedataURL);
         }
     }
 
@@ -147,10 +154,10 @@ function Create() {
         </div>
         <div className='mint'>
             <input type="file" accept='image/png, image/jpg, image/jpeg' onChange={handleFileChange} /><br />
-            <input type="number" placeholder="rows" id='row' onChange={updateDimension} /><br />
-            <input type="number" placeholder="columns" id='column' onChange={updateDimension} /><br />
+            <input type="number" placeholder="2" id='row' onChange={updateDimension} /><br />
+            <input type="number" placeholder="2" id='column' onChange={updateDimension} /><br />
             <img className="nft-image" id='nft' /><br />
-            <input type="submit" value='MINT' onClick={fileUpload} />
+            <input id='mint' type="submit" value='MINT' onClick={fileUpload} disabled={!file} />
         </div>
     
     </div>

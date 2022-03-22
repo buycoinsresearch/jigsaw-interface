@@ -137,4 +137,13 @@ body {
     padding: 10px 20px;
     border-radius: 4px;
   }
+  .claim button {
+    width: 30%;
+    margin: 0 auto;
+  }
+
+  .game {
+      max-width: 1000px;
+        margin: 0 auto;
+  }
   
