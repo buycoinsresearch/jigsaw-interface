@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import './Mint.css';
 import 'react-bootstrap';
-import IpfsUpload from '../ImageHandler/IpfsUpload';
+import { Confirmation } from './MintPopup'
 import { NFT } from '../Components/NFT';
 import { sha256 } from 'ethers/lib/utils';
 import abi from '.././JigsawABI.json';
 import { ethers, Signer } from 'ethers';
 import { create } from 'ipfs-http-client';
 import { Buffer } from 'buffer';
+import { useModal } from 'react-hooks-use-modal';
 
-const contractAddress = '0x60adbd2efb2e65034df80882e1146e82f519a5a2';
+const contractAddress = '0xB30d25a037AefD6C90B4F6f8a3333bbb832F9385';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
 const infuraProvider = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`;
 
 function Create() {
     const client = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
     const [file, setFile] = useState<File>();
+    const [src, setsrc] = useState<string>();
     const [nftURL, setNftURL] = useState<string>();
     const [nft, setNFT] = useState<NFT[] | undefined>()
     const [imageSize, setImageSize] = useState<{ width: number, height: number }>()
@@ -23,6 +25,14 @@ function Create() {
         row: 2,
         column: 2,
     })
+    const [description, setDescription] = useState<{ name: string, description: string }>({
+        name: '',
+        description: '',
+    });
+    const [Modal, open, close, isOpen] = useModal('root', {
+        preventScroll: true,
+        closeOnOverlayClick: false
+      });
 
     const mint = document.getElementById('mint') as HTMLInputElement;
 
@@ -33,14 +43,11 @@ function Create() {
       }
 
     useEffect(() => {
-        if (file !== undefined && dimension?.column !== 0 && dimension?.row !== 0) {
-            mint.disabled = false;
-        } 
 
         if (nft !== undefined && nftURL !== undefined) {
             MintF(nft!, nftURL!);
         }
-    }, [nft, nftURL, file, dimension])
+    }, [nft, nftURL])
 
     async function MintF(solution: NFT[], uri: string) {
         console.log("Minting...");
@@ -49,7 +56,7 @@ function Create() {
         const hexString = "0x" + toHexString(buffer) 
        
         const hash = sha256(hexString);
-
+        console.log(hexString, hash)
         const abiCoder = new ethers.utils.Interface(abi);
         const encodedData = abiCoder.encodeFunctionData("createNFTs", [[hash], [uri]]);
         
@@ -71,7 +78,6 @@ function Create() {
         
         }
     }
-
 
     function Solution(uri: string, rows: number, columns: number) {
         const image = new Image();
@@ -102,7 +108,7 @@ function Create() {
         const URL = window.URL || window.webkitURL;
         const image = document.getElementById('nft') as HTMLImageElement;
         image.src = URL.createObjectURL(fileData);
-        
+        setsrc(URL.createObjectURL(fileData));
     }
 
     const fileUpload = async () => {
@@ -122,13 +128,12 @@ function Create() {
                     }
                 ]
             })
-
             
             console.log(url)
             
             Solution(url!, dimension!.row, dimension!.column)!
 
-            const metadataCID = await client.add(metadata);
+            const metadataCID = await client.add(JSON.parse(metadata));
             const metedataURL = `https://ipfs.io/ipfs/${metadataCID.cid.toString()}`
             setNftURL(metedataURL);
             // MintF(solution!, metedataURL);
@@ -138,11 +143,23 @@ function Create() {
     const updateDimension = () => {
         const row = document.getElementById('row') as HTMLInputElement;
         const column = document.getElementById('column') as HTMLInputElement;
+        const name = document.getElementById('name') as HTMLInputElement;
         setDimension({
             row: parseInt(row.value),
             column: parseInt(column.value)
         })
     }
+
+    const updateDescription = () => {
+        const name = document.getElementById('name') as HTMLInputElement;
+        const description = document.getElementById('description') as HTMLInputElement;
+        setDescription({
+            name: name.value,
+            description: description.value
+        })
+    }
+
+
     
     return (
     <div className="App">
@@ -154,11 +171,22 @@ function Create() {
         </div>
         <div className='mint'>
             <input type="file" accept='image/png, image/jpg, image/jpeg' onChange={handleFileChange} /><br />
-            <input type="number" placeholder="2" id='row' onChange={updateDimension} /><br />
-            <input type="number" placeholder="2" id='column' onChange={updateDimension} /><br />
+            <input type="text" placeholder="Name" id='name' onChange={updateDescription} /><br />
+            <input type="text" placeholder="Description" id="description" onChange={updateDescription} /><br />
+            <input type="number" placeholder="Rows" id='row' aria-label='Name' onChange={updateDimension} /><br />
+            <input type="number" placeholder="Columns" id='column' onChange={updateDimension} /><br />
             <img className="nft-image" id='nft' /><br />
-            <input id='mint' type="submit" value='MINT' onClick={fileUpload} disabled={!file} />
+            <input id='mint' type="submit" value='MINT' onClick={open} disabled={!file} />
         </div>
+        <Modal>
+            <div className='mintModal'>
+                <img className="modal-image" id='nft' src={src} /><br />
+                <p>Name: {description.name}</p>
+                <p>Description: {description.description}</p>
+                <p>Dimension: {dimension.row} x {dimension.column}</p>
+                <button onClick={close}>CLOSE</button>
+            </div>
+        </Modal>
     
     </div>
     );
