@@ -5,21 +5,43 @@ import { NFT } from '../Components/NFT';
 import { Buffer } from 'buffer';
 import abi from '../JigsawABI.json';
 import { ethers, Signer } from 'ethers';
-import App from '../Dashboard/App';
+import { create } from 'ipfs-http-client'
 
 const contractAddress = '0xB30d25a037AefD6C90B4F6f8a3333bbb832F9385';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
 const infuraProvider = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`;
+const client = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 
 function Play() {
     const [nft, setNFT] = useState<NFT[] | undefined>()
+    const [gameImage, setGameImage] = useState({
+        src: '',
+        name: '',
+        description: '',
+    })
     const [imageSize, setImageSize] = useState<{ width: number, height: number }>()
-    const location = window.location.href;
-    const cid = location.split('/').pop();
+    var cid: string = "";
+
+    async function getNFT() {
+      const location = window.location.href;
+      const metadataCid = location.split('/').pop();
+      const metadataUrl = "https://ipfs.io/ipfs/QmawffoMaNvsHy6N3UgcvELbzyG3WjAYE2MhKYzPawVQjA/1.json";
+      const metadata = await (await fetch(metadataUrl)).json();
+      const imageUrl = metadata["image"]
+      
+      setGameImage({
+        src: imageUrl,
+        name: metadata["name"],
+        description: metadata["description"],
+      })
+      return imageUrl;
+    }
+
 
     useEffect(() => {
-
-    }, [nft])
+      cid = gameImage.src;
+      console.log(gameImage.src)
+    }, [gameImage])
 
     function toHexString(byteArray: Uint8Array) {
         return Array.from(byteArray, function(byte) {
@@ -29,7 +51,7 @@ function Play() {
 
     async function Claim(tokenId: number) {
         const image = new Image();
-        image.src = `https://ipfs.io/ipfs/${cid}`;
+        image.src = `${cid}`;
         
         const rows = 3;
         const columns = 3;
@@ -87,14 +109,16 @@ function Play() {
     }
 
     return (
-        <div className="game">
+        <div>
+           <button onClick={getNFT}>Play</button>
+          <div id="gamepage">
+          <div className="game">
             <div className="game-board">
               <JigsawPuzzle
-                  imageSrc={`https://ipfs.io/ipfs/${cid}`}
+                  imageSrc={gameImage.src}
                   rows={3}
                   columns={3}
                   onSolved={() => {
-                  
                       const elem = document.createElement('button');
                       elem.innerHTML = 'Claim';
                       elem.onclick = () => {
@@ -104,7 +128,9 @@ function Play() {
                     }
                   }
                   />
-            </div>
+          </div>
+        </div>
+          </div>
         </div>
     );
 }
