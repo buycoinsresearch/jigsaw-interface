@@ -43,9 +43,7 @@ function Create() {
       }
 
     useEffect(() => {
-        console.log(nft, nftURL)
         if (nft !== undefined && nftURL !== undefined) {
-            console.log("got here")
             MintF(nft!, nftURL!);
         }
     }, [nft, nftURL])
@@ -57,7 +55,6 @@ function Create() {
         const hexString = "0x" + toHexString(buffer) 
        
         const hash = sha256(hexString);
-        console.log(hexString, hash)
         const abiCoder = new ethers.utils.Interface(abi);
         const encodedData = abiCoder.encodeFunctionData("createNFTs", [[hash], [uri]]);
         
@@ -130,16 +127,14 @@ function Create() {
                 ]
             })
             
-            console.log(url)
+            // console.log(url)
             
             Solution(url!, dimension!.row, dimension!.column)!
 
             const metadataCID = await client.add(metadata);
-            console.log(metadataCID)
             const metedataURL = `https://ipfs.io/ipfs/${metadataCID.cid.toString()}`
-            console.log(metedataURL)
             setNftURL(metedataURL);
-            // MintF(solution!, metedataURL);
+            
         }
     }
 
