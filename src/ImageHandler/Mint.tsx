@@ -5,7 +5,7 @@ import { Confirmation } from './MintPopup'
 import { NFT } from '../Components/NFT';
 import { sha256 } from 'ethers/lib/utils';
 import abi from '.././JigsawABI.json';
-import { ethers, Signer } from 'ethers';
+import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 import { Buffer } from 'buffer';
 import { useModal } from 'react-hooks-use-modal';
@@ -43,8 +43,9 @@ function Create() {
       }
 
     useEffect(() => {
-
+        console.log(nft, nftURL)
         if (nft !== undefined && nftURL !== undefined) {
+            console.log("got here")
             MintF(nft!, nftURL!);
         }
     }, [nft, nftURL])
@@ -133,8 +134,10 @@ function Create() {
             
             Solution(url!, dimension!.row, dimension!.column)!
 
-            const metadataCID = await client.add(JSON.parse(metadata));
+            const metadataCID = await client.add(metadata);
+            console.log(metadataCID)
             const metedataURL = `https://ipfs.io/ipfs/${metadataCID.cid.toString()}`
+            console.log(metedataURL)
             setNftURL(metedataURL);
             // MintF(solution!, metedataURL);
         }
@@ -180,11 +183,12 @@ function Create() {
         </div>
         <Modal>
             <div className='mintModal'>
+                <button className='close' onClick={close}>&#x2715;</button>
                 <img className="modal-image" id='nft' src={src} /><br />
                 <p>Name: {description.name}</p>
                 <p>Description: {description.description}</p>
                 <p>Dimension: {dimension.row} x {dimension.column}</p>
-                <button onClick={close}>CLOSE</button>
+                <button onClick={fileUpload}>Continue</button>
             </div>
         </Modal>
     

@@ -162,3 +162,7 @@ body {
     margin: 0 auto;
   }
   
+  .claim button .close {
+    float: right;
+    border: none;
+  }
