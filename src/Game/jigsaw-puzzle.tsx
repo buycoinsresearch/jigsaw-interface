@@ -202,7 +202,7 @@ export const JigsawPuzzle: FC<JigsawPuzzleProps> = ({
             play = newState;
             onSolved()
         }
-        console.log(newState)
+        
         return newState
     })
     

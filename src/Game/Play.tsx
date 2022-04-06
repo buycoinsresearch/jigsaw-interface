@@ -7,32 +7,41 @@ import abi from '../JigsawABI.json';
 import { ethers, Signer } from 'ethers';
 import { create } from 'ipfs-http-client'
 
-const contractAddress = '0xB30d25a037AefD6C90B4F6f8a3333bbb832F9385';
-const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
-const infuraProvider = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`;
+const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
+const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
+const provider = new ethers.providers.JsonRpcProvider(infuraUrl)
+const contract = new ethers.Contract(contractAddress, abi, provider);
 const client = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
 
 function Play() {
     const [nft, setNFT] = useState<NFT[] | undefined>()
     const [gameImage, setGameImage] = useState({
+        tokenId: 0,
         src: '',
         name: '',
         description: '',
+        row: 0,
+        column: 0,
     })
     const [imageSize, setImageSize] = useState<{ width: number, height: number }>()
     var cid: string = "";
 
     async function getNFT() {
       const location = window.location.href;
-      const metadataCid = location.split('/').pop();
-      const metadataUrl = "https://ipfs.io/ipfs/QmawffoMaNvsHy6N3UgcvELbzyG3WjAYE2MhKYzPawVQjA/1.json";
+      const tokenId = location.split('/').pop();
+      const metadataUrl = await contract.getTokenDetails(tokenId);
+      console.log(metadataUrl);
+      // const metadataUrl = "https://ipfs.io/ipfs/QmawffoMaNvsHy6N3UgcvELbzyG3WjAYE2MhKYzPawVQjA/1.json";
       const metadata = await (await fetch(metadataUrl)).json();
       const imageUrl = metadata["image"]
       
       setGameImage({
+        tokenId: parseInt(tokenId!),
         src: imageUrl,
         name: metadata["name"],
         description: metadata["description"],
+        row: metadata["attributes"][0].rows,
+        column: metadata["attributes"][0].columns,
       })
       return imageUrl;
     }
@@ -40,8 +49,12 @@ function Play() {
 
     useEffect(() => {
       cid = gameImage.src;
-      console.log(gameImage.src)
+      console.log(gameImage.row, gameImage.column)
     }, [gameImage])
+
+    useEffect(() => {
+      submitSolution();
+    }, [nft])
 
     function toHexString(byteArray: Uint8Array) {
         return Array.from(byteArray, function(byte) {
@@ -49,12 +62,12 @@ function Play() {
         }).join('')
     }
 
-    async function Claim(tokenId: number) {
+    async function Claim() {
         const image = new Image();
         image.src = `${cid}`;
         
-        const rows = 3;
-        const columns = 3;
+        const rows = gameImage.row;
+        const columns = gameImage.column;
         image.onload = () => {
           console.log(image.width, image.height);
             setImageSize({ width: image.width, height: image.height })
@@ -70,15 +83,18 @@ function Play() {
                     }))
             )
         }
+    }
 
-        const sortedSolution: NFT[] = nft!.sort((a,b) => {
-            if (a.correctPosition < b.correctPosition) {
-                return -1
-            } else if (a.correctPosition > b.correctPosition) {
-                return 1
-            }
-            return 0
-        })
+    async function submitSolution() {
+      const tokenId = gameImage.tokenId
+      const sortedSolution: NFT[] = nft!.sort((a,b) => {
+        if (a.correctPosition < b.correctPosition) {
+            return -1
+        } else if (a.correctPosition > b.correctPosition) {
+            return 1
+        }
+        return 0
+      })
 
       const stringSolution = JSON.stringify(sortedSolution!);
       console.log(stringSolution);
@@ -95,7 +111,7 @@ function Play() {
           method: 'eth_requestAccounts',
         })
         //   console.log(encodedData);
-  
+
         await window.ethereum.request({
           method: 'eth_sendTransaction' as any,
           params: [{
@@ -116,13 +132,13 @@ function Play() {
             <div className="game-board">
               <JigsawPuzzle
                   imageSrc={gameImage.src}
-                  rows={3}
-                  columns={3}
+                  rows={gameImage.row}
+                  columns={gameImage.column}
                   onSolved={() => {
                       const elem = document.createElement('button');
                       elem.innerHTML = 'Claim';
                       elem.onclick = () => {
-                          Claim(1);
+                          Claim();
                       }
                       document.body.appendChild(elem);
                     }

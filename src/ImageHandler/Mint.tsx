@@ -10,7 +10,7 @@ import { create } from 'ipfs-http-client';
 import { Buffer } from 'buffer';
 import { useModal } from 'react-hooks-use-modal';
 
-const contractAddress = '0xB30d25a037AefD6C90B4F6f8a3333bbb832F9385';
+const contractAddress = '0xcE85907b8962D1b908747f7A100fA947934812a2';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
 const infuraProvider = `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`;
 
@@ -44,6 +44,7 @@ function Create() {
 
     useEffect(() => {
         if (nft !== undefined && nftURL !== undefined) {
+            console.log("here1")
             MintF(nft!, nftURL!);
         }
     }, [nft, nftURL])
@@ -114,10 +115,11 @@ function Create() {
         if(file != null) {
             // const CUD = await IpfsUpload(file);
             const CID = await client.add(file);
+            // console.log(CID);
             const url = `https://ipfs.io/ipfs/${CID.cid.toString()}`
             const metadata = JSON.stringify({
-                "name": file.name,
-                "description": "Jigsaw puzzle",
+                "name": description.name,
+                "description": description.description,
                 "image": url,
                 "attributes": [
                     {
@@ -132,6 +134,7 @@ function Create() {
             Solution(url!, dimension!.row, dimension!.column)!
 
             const metadataCID = await client.add(metadata);
+            // console.log(metadataCID)
             const metedataURL = `https://ipfs.io/ipfs/${metadataCID.cid.toString()}`
             setNftURL(metedataURL);
             

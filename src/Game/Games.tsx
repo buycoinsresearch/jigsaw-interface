@@ -5,21 +5,19 @@ import 'react-multi-carousel/lib/styles.css';
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
 
-const contractAddress = "0xB30d25a037AefD6C90B4F6f8a3333bbb832F9385"
+const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
 const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
 const provider = new ethers.providers.JsonRpcProvider(infuraUrl)
 const contract = new ethers.Contract(contractAddress, abi, provider);
 
-
 export default function Game() {
 
-    const [valid, setValid] = useState<{src: string, name: string, description: string}[]>([]);
+    const [valid, setValid] = useState<{src: string, name: string, description: string, tokenId: number}[]>([]);
     const [invalid, setInvalid] = useState<{src: string, name: string, description: string}[]>([]);
+    const [validUriIndex, setValidUriIndex] = useState(0);
+    const [invalidUriIndex, setInvalidUriIndex] = useState(0);
 
-    // const validCarousel = document.getElementsByTagName('Carousel')[0] as HTMLElement;
-    // const invalidCarousel = document.getElementsByTagName('Carousel')[1] as HTMLElement;
-
-    async function getNFT(metadataUrl: string) {
+    async function getNFT(metadataUrl: string, tokenId: number) {
         const metadata = await (await fetch(metadataUrl)).json();
         const imageUrl = metadata["image"]
         const name = metadata["name"]
@@ -29,65 +27,51 @@ export default function Game() {
             src: imageUrl,
             name: name,
             description: description,
+            tokenId: tokenId
         }
     }
 
-    async function validGames() {
-        const uris = await contract.getUris(1, 6, false)
-        console.log(uris)
-        for (let i = 0; i < uris.length; i++) {
-            const metadataUrl = uris[i]
-            const nft = await getNFT(metadataUrl)
-            setValid(prevState => [...prevState!, nft])
-        }
-    }
-
-    async function invalidGames() {
-        const uris = await contract.getUris(1, 6, true)
-        for (let i = 0; i < uris.length; i++) {
-            const metadataUrl = uris[i]
-            const nft = await getNFT(metadataUrl)
-            setInvalid(prevState => [...prevState!, nft])
-        }
-    }
-
-    useEffect(() => {
-        validGames()
-        invalidGames()
-    })
-
-    useEffect(() => {
-        var newCarousel = ""
-        if (valid!.length > 0) {
-            for (let i = 0; i < valid!.length; i++) {
-                newCarousel += `
-                <div className='game'>
-                    <img src="${valid![i].src}" alt="" />
-                    <h3>${valid![i].name}</h3>
-                    <p>${valid![i].description}</p>
-                    <button>Test</button>
-                </div>
-                `
+    async function getGames() {
+        var validIndex: number = 0;
+        var invalidIndex: number = 0;
+        var total = await contract.total();
+        while (validIndex < 5 && invalidIndex < 5 && total > 0) {
+            console.log("total: ", total)
+            const tokenStatus = await contract.getTokenStatus(total);
+            const metadataUrl = await contract.getTokenDetails(total);
+            const nft = await getNFT(metadataUrl, total);
+            console.log(tokenStatus, metadataUrl, nft)
+            if (tokenStatus == false && validIndex < 5) {
+                setValid(valid => [...valid, nft]);
+                validIndex++;
+                if (validIndex == 5) {
+                    setValidUriIndex(total);
+                }
+            } else if (tokenStatus == true && invalidIndex < 5) {
+                setInvalid(invalid => [...invalid, nft]);
+                invalidIndex++;
+                if (invalidIndex == 5) {
+                    setInvalidUriIndex(total);
+                }
             }
+            total--;
         }
-        // validCarousel.innerHTML = newCarousel
+    }
 
-    }, [valid])
+    async function playGame(index: number) {
+        const currentPage = window.location.href;
+        const newPage = currentPage + "/" + valid[index].tokenId;
+        window.location.href = newPage;
+    }
 
     useEffect(() => {
-        var newCarousel = ""
-        for (let i = 0; i < invalid!.length; i++) {
-            newCarousel += `
-            <div className='game'>
-                <img src="${invalid![i].src}" alt="" />
-                <h3>${invalid![i].name}</h3>
-                <p>${invalid![i].description}</p>
-                <button>Test</button>
-            </div>
-            `
-        }
-        // invalidCarousel.innerHTML = newCarousel
-    }, [invalid])
+        getGames()
+    }, [])
+
+    useEffect(() => {
+        console.log("valid: ", valid)
+        console.log("invalid: ", invalid)
+    }, [valid, invalid])
 
     const responsive = {
         desktop: {
@@ -113,30 +97,14 @@ export default function Game() {
             <div className="games">
                 <h2>Active Games</h2>
                 <Carousel responsive={responsive} >
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
-                    </div>
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
-                    </div>
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
-                    </div>
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
-                    </div>
+                    {valid!.map((game, index) => (
+                        <div className="game" key={index}>
+                            <img src={game.src} alt="" />
+                            <h3>{game.name}</h3>
+                            <p>{game.description}</p>
+                            <button onClick={() => {playGame(index)}}>Play</button>
+                        </div>
+                    ))}
                     <div>
                         <button className='games-button'><a href='#'>See more</a></button>
                     </div>
@@ -146,28 +114,24 @@ export default function Game() {
                 <h2>Inactive Games</h2>
                 <Carousel responsive={responsive} >
                     <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
+                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
                         <h3>Jigsaw</h3>
                         <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
                     </div>
                     <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
+                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
                         <h3>Jigsaw</h3>
                         <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
                     </div>
                     <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
+                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
                         <h3>Jigsaw</h3>
                         <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
                     </div>
                     <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmUXJ31goEDcUJJHpg7xSAJuzpmHbQd2h8eqKCGT8Wyiou" alt=""/>
+                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
                         <h3>Jigsaw</h3>
                         <p>Lorem ipsum colon durag sitle lipo</p>
-                        <button>Test</button>
                     </div>
                     <div>
                         <button className='games-button'><a href='#'>See more</a></button>
