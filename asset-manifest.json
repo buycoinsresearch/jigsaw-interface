@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/react-gh-pages/static/css/main.3c28306b.css",
+    "main.js": "/react-gh-pages/static/js/main.e1ad09d2.js",
+    "static/js/787.bc1758dc.chunk.js": "/react-gh-pages/static/js/787.bc1758dc.chunk.js",
+    "static/media/Pad.png": "/react-gh-pages/static/media/Pad.4e4002aa1168dea13806.png",
+    "static/media/jigsaws.png": "/react-gh-pages/static/media/jigsaws.bd04b2040809a3ccc8f5.png",
+    "static/media/revicons.eot": "/react-gh-pages/static/media/revicons.a77de540a38981833f9e.eot",
+    "static/media/revicons.ttf": "/react-gh-pages/static/media/revicons.57fd05d4ae650374c8de.ttf",
+    "static/media/revicons.woff": "/react-gh-pages/static/media/revicons.e8746a624ed098489406.woff",
+    "index.html": "/react-gh-pages/index.html",
+    "main.3c28306b.css.map": "/react-gh-pages/static/css/main.3c28306b.css.map",
+    "main.e1ad09d2.js.map": "/react-gh-pages/static/js/main.e1ad09d2.js.map",
+    "787.bc1758dc.chunk.js.map": "/react-gh-pages/static/js/787.bc1758dc.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3c28306b.css",
+    "static/js/main.e1ad09d2.js"
+  ]
+}
