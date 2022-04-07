@@ -43,6 +43,10 @@
     cursor: pointer;
 }
 
+.claim {
+    margin: 20px auto;
+}
+
 p {
     color: white;
 }

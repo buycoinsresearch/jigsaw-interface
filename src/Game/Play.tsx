@@ -30,8 +30,6 @@ function Play() {
       const location = window.location.href;
       const tokenId = location.split('/').pop();
       const metadataUrl = await contract.getTokenDetails(tokenId);
-      console.log(metadataUrl);
-      // const metadataUrl = "https://ipfs.io/ipfs/QmawffoMaNvsHy6N3UgcvELbzyG3WjAYE2MhKYzPawVQjA/1.json";
       const metadata = await (await fetch(metadataUrl)).json();
       const imageUrl = metadata["image"]
       
@@ -43,17 +41,22 @@ function Play() {
         row: metadata["attributes"][0].rows,
         column: metadata["attributes"][0].columns,
       })
+      const playButton = document.getElementById('play-button') as HTMLButtonElement;
+      playButton.disabled = true;
       return imageUrl;
     }
 
 
     useEffect(() => {
       cid = gameImage.src;
-      console.log(gameImage.row, gameImage.column)
     }, [gameImage])
 
     useEffect(() => {
-      submitSolution();
+      const claimButton = document.getElementsByClassName('claim-button')[0] as HTMLButtonElement;
+      claimButton.disabled = true;
+      if (nft !== undefined) {
+        submitSolution();
+      }
     }, [nft])
 
     function toHexString(byteArray: Uint8Array) {
@@ -95,15 +98,14 @@ function Play() {
         }
         return 0
       })
-
-      const stringSolution = JSON.stringify(sortedSolution!);
-      console.log(stringSolution);
+      
+      const stringSolution = sortedSolution.toString()
       const buffer = Buffer.from(stringSolution);
       const hexString = "0x" + toHexString(buffer) 
 
       const abiCoder = new ethers.utils.Interface(abi);
       const encodedData = abiCoder.encodeFunctionData("completePuzzle", [tokenId, hexString]);
-      console.log(buffer, hexString, encodedData);
+      // console.log(hexString, encodedData, buffer);
       
       if (window.ethereum) {
         
@@ -126,26 +128,37 @@ function Play() {
 
     return (
         <div>
-           <button onClick={getNFT}>Play</button>
+           <div className="play">
+            <button onClick={getNFT} id="play-button">Click to Play</button>
+           </div>
           <div id="gamepage">
-          <div className="game">
-            <div className="game-board">
-              <JigsawPuzzle
-                  imageSrc={gameImage.src}
-                  rows={gameImage.row}
-                  columns={gameImage.column}
-                  onSolved={() => {
-                      const elem = document.createElement('button');
-                      elem.innerHTML = 'Claim';
-                      elem.onclick = () => {
-                          Claim();
+            <div className="game">
+              <div className="game-board">
+                <JigsawPuzzle
+                    imageSrc={gameImage.src}
+                    rows={gameImage.row}
+                    columns={gameImage.column}
+                    onSolved={() => {
+                        // const elem = document.createElement('button');
+                        // elem.innerHTML = 'Claim';
+                        // elem.onclick = () => {
+                        //     Claim();
+                        // }
+                        // document.body.appendChild(elem);
+                        const claim = document.getElementsByClassName('claim')[0] as HTMLDivElement;
+                        const claimButton = document.getElementsByClassName('claim-button')[0] as HTMLButtonElement;
+                        claimButton.disabled = false;
+                        claim.onclick = () => {
+                            Claim();
+                        }
                       }
-                      document.body.appendChild(elem);
                     }
-                  }
-                  />
+                    />
+             </div>
+           </div>
           </div>
-        </div>
+          <div className="claim">
+            <button className="claim-button">Claim</button>
           </div>
         </div>
     );

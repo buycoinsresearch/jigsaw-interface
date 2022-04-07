@@ -113,26 +113,13 @@ export default function Game() {
             <div className="games">
                 <h2>Inactive Games</h2>
                 <Carousel responsive={responsive} >
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                    </div>
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                    </div>
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                    </div>
-                    <div className='game'>
-                        <img src="https://ipfs.io/ipfs/QmZGxA9qnc6qQTZN3XN8j1dBgmFUTopFS5E2Xqti6KdinY" alt=""/>
-                        <h3>Jigsaw</h3>
-                        <p>Lorem ipsum colon durag sitle lipo</p>
-                    </div>
+                    {invalid!.map((game, index) => (
+                        <div className="game" key={index}>
+                            <img src={game.src} alt="" />
+                            <h3>{game.name}</h3>
+                            <p>{game.description}</p>
+                        </div>
+                    ))}
                     <div>
                         <button className='games-button'><a href='#'>See more</a></button>
                     </div>

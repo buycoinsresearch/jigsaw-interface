@@ -51,7 +51,16 @@ function Create() {
 
     async function MintF(solution: NFT[], uri: string) {
         console.log("Minting...");
-        const stringSolution = solution.toString()
+        const sortedSolution: NFT[] = nft!.sort((a,b) => {
+            if (a.correctPosition < b.correctPosition) {
+                return -1
+            } else if (a.correctPosition > b.correctPosition) {
+                return 1
+            }
+            return 0
+          })
+        
+        const stringSolution = sortedSolution.toString()
         const buffer = Buffer.from(stringSolution);
         const hexString = "0x" + toHexString(buffer) 
        
