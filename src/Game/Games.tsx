@@ -11,7 +11,6 @@ const provider = new ethers.providers.JsonRpcProvider(infuraUrl)
 const contract = new ethers.Contract(contractAddress, abi, provider);
 
 export default function Game() {
-
     const [valid, setValid] = useState<{src: string, name: string, description: string, tokenId: number}[]>([]);
     const [invalid, setInvalid] = useState<{src: string, name: string, description: string}[]>([]);
     const [validUriIndex, setValidUriIndex] = useState(0);
@@ -36,11 +35,9 @@ export default function Game() {
         var invalidIndex: number = 0;
         var total = await contract.total();
         while (validIndex < 5 && invalidIndex < 5 && total > 0) {
-            console.log("total: ", total)
             const tokenStatus = await contract.getTokenStatus(total);
             const metadataUrl = await contract.getTokenDetails(total);
             const nft = await getNFT(metadataUrl, total);
-            console.log(tokenStatus, metadataUrl, nft)
             if (tokenStatus == false && validIndex < 5) {
                 setValid(valid => [...valid, nft]);
                 validIndex++;
@@ -69,8 +66,6 @@ export default function Game() {
     }, [])
 
     useEffect(() => {
-        console.log("valid: ", valid)
-        console.log("invalid: ", invalid)
     }, [valid, invalid])
 
     const responsive = {
@@ -100,15 +95,15 @@ export default function Game() {
                     {valid!.map((game, index) => (
                         <div className="game" key={index}>
                             <img src={game.src} alt="" />
-                            <h3>{game.name}</h3>
-                            <p>{game.description}</p>
+                            <h3>{(game.name).slice(0, 15)}</h3>
+                            <p>{(game.description).slice(0, 120)}</p>
                             <button onClick={() => {playGame(index)}}>Play</button>
                         </div>
-                    ))}
-                    <div>
-                        <button className='games-button'><a href='#'>See more</a></button>
-                    </div>
+                    ))}   
                 </Carousel>
+                {/* <div>
+                    <button className='games-button'><a href='#'>See more</a></button>
+                </div>  */}
             </div>
             <div className="games">
                 <h2>Inactive Games</h2>
@@ -120,9 +115,9 @@ export default function Game() {
                             <p>{game.description}</p>
                         </div>
                     ))}
-                    <div>
+                    {/* <div>
                         <button className='games-button'><a href='#'>See more</a></button>
-                    </div>
+                    </div> */}
                 </Carousel>
             </div>
         </div>
