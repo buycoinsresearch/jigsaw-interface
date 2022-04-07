@@ -139,12 +139,6 @@ function Play() {
                     rows={gameImage.row}
                     columns={gameImage.column}
                     onSolved={() => {
-                        // const elem = document.createElement('button');
-                        // elem.innerHTML = 'Claim';
-                        // elem.onclick = () => {
-                        //     Claim();
-                        // }
-                        // document.body.appendChild(elem);
                         const claim = document.getElementsByClassName('claim')[0] as HTMLDivElement;
                         const claimButton = document.getElementsByClassName('claim-button')[0] as HTMLButtonElement;
                         claimButton.disabled = false;
