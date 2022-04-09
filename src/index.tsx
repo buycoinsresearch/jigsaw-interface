@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { Web3ReactProvider } from '@web3-react/core';
-import { BrowserRouter as Router } from 'react-router-dom';
+import WalletConnectProvider from '@walletconnect/react-native-dapp';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Jigsaw from './route';
 import { ethers } from 'ethers';
 
@@ -16,9 +16,15 @@ const getLibrary = (provider: any) => {
 
 ReactDOM.render(
   <React.StrictMode>
-    <Web3ReactProvider getLibrary={getLibrary}>
+    {/* <Web3ReactProvider getLibrary={getLibrary}> */}
+    {/* <WalletConnectProvider
+      redirectUrl={window.location.href}
+      storageOptions= {{
+        // asyncStorage: AsyncStorage,
+      }}> */}
       <Jigsaw />
-    </Web3ReactProvider>
+      {/* </WalletConnectProvider> */}
+    {/* </Web3ReactProvider> */}
       
     {/* </Provider> */}
   </React.StrictMode>,

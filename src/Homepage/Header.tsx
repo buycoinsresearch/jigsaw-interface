@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import logo from '../jigsaws.png';
-import { ethers } from 'ethers';
-import detectEthereumProvider from '@metamask/detect-provider';import { useWeb3React } from '@web3-react/core'
-import { injected, CoinbaseWallet, WalletConnect } from './WalletConnect';
+import { ethers, providers } from 'ethers';
+import detectEthereumProvider from '@metamask/detect-provider';
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 function Header() {
     const [address, setAddress] = useState('');
     const [home, setHome] = useState('');
-    const { active, activate, deactivate, library, chainId, account } = useWeb3React();
+    const [injected, setInjected] = useState(true)
 
     async function connect() {
         const provider = await detectEthereumProvider();
@@ -17,12 +19,23 @@ function Header() {
             })
             setAddress(accounts[0]);
             window.localStorage.setItem('address', accounts[0]);
-        } 
+        } else {
+            // Create a connector
+            const connector = new WalletConnect({
+                bridge: "https://bridge.walletconnect.org", // Required
+                qrcodeModal: QRCodeModal,
+            });
+            
+            // Check if connection is already established
+            if (!connector.connected) {
+                // create new session
+                connector.createSession();
+            }
+        }
     }
 
     useEffect(() => {
         if (window.localStorage.getItem('address')) {
-            console.log("yes")
             setAddress(window.localStorage.getItem('address')!);
         }
         if (address !== "") {
@@ -36,14 +49,15 @@ function Header() {
     }, [address])
 
     return (
-        <div className="App-header">{account 
+        <div className="App-header">
+            {/* {account 
                 ? <button onClick={() => deactivate()}>Disconnect</button> 
                 : <button onClick={() => {
                     activate(WalletConnect, undefined, true)
                     .then((resp) => console.log(resp))
                     .catch((err) => console.log(err))
                 }}>Connect</button>
-            }
+            } */}
         <a href={home}><img src={logo} className="App-logo" alt="logo" /></a>
         <button id="connect-wallet" onClick={connect}>Connect wallet</button>
         </div>
