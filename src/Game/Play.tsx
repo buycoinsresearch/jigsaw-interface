@@ -6,6 +6,7 @@ import { Buffer } from 'buffer';
 import abi from '../JigsawABI.json';
 import { ethers, Signer } from 'ethers';
 import { create } from 'ipfs-http-client'
+import Header from '../Homepage/Header';
 
 const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
 const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
@@ -128,6 +129,7 @@ function Play() {
 
     return (
         <div>
+          <Header />
            <div className="play">
             <button onClick={getNFT} id="play-button">Click to Play</button>
            </div>

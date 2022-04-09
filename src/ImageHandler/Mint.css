@@ -103,7 +103,7 @@ body {
     margin: auto;
   } */
   
-  .App {
+  .Mint {
     max-width: 600px;
     margin: 0 auto;
   }
@@ -129,7 +129,7 @@ body {
     font-weight: 200;
   }
   
-  button {
+ button {
     display: block;
     appearance: none;
     margin-top: 40px;

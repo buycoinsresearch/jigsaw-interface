@@ -9,6 +9,7 @@ import { ethers } from 'ethers';
 import { create } from 'ipfs-http-client';
 import { Buffer } from 'buffer';
 import { useModal } from 'react-hooks-use-modal';
+import Header from '../Homepage/Header';
 
 const contractAddress = '0xcE85907b8962D1b908747f7A100fA947934812a2';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
@@ -172,15 +173,13 @@ function Create() {
 
     
     return (
-    <div className="App">
-        <header className="App-header container">
-            
-        </header>
+    <div className="Mint">
+        <Header />
         <div className="App-hero container">
     
         </div>
         <div className='mint'>
-            <input type="file" accept='image/png, image/jpg, image/jpeg' onChange={handleFileChange} /><br />
+            <input type="file" accept='image/jpg, image/jpeg' onChange={handleFileChange} /><br />
             <input type="text" placeholder="Name" id='name' onChange={updateDescription} /><br />
             <input type="text" placeholder="Description" id="description" onChange={updateDescription} /><br />
             <input type="number" placeholder="Rows" id='row' aria-label='Name' onChange={updateDimension} /><br />

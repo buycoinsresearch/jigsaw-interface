@@ -4,6 +4,7 @@ import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
+import Header from '../Homepage/Header';
 
 const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
 const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
@@ -89,6 +90,7 @@ export default function Game() {
       
     return (
         <div className="container">
+            <Header />
             <div className="games">
                 <h2>Active Games</h2>
                 <Carousel responsive={responsive} >

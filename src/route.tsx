@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 
-import App from './Dashboard/App';
+import App from './Homepage/App';
 import Play from './Game/Play';
 import Game from './Game/Games';
 import Create from './ImageHandler/Mint';

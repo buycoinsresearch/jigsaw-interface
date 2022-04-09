@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './Dashboard/App';
+import App from './Homepage/App';
 import Create from './ImageHandler/Mint';
 import reportWebVitals from './reportWebVitals';
 import { Connector } from './Wallet/Connector';
