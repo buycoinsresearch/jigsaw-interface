@@ -91,13 +91,19 @@ a:hover {
   position: relative;
   display: inline-block;
   margin: 15px;
+  cursor: pointer;
 }
 
 .hero button:hover {
   background-color: #ec5990;
   color: #ffff;
+  cursor: pointer;
 }
 
 p {
   color: #ffff
+}
+
+button:hover {
+  cursor: pointer;
 }
