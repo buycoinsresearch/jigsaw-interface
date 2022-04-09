@@ -1,19 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './Homepage/App';
-import Create from './ImageHandler/Mint';
 import reportWebVitals from './reportWebVitals';
-import { Connector } from './Wallet/Connector';
-import { Provider } from 'wagmi';
+import { Web3ReactProvider } from '@web3-react/core';
+import { BrowserRouter as Router } from 'react-router-dom';
 import Jigsaw from './route';
+import { ethers } from 'ethers';
+
+const POLLING_INTERVAL = 12000;
+
+const getLibrary = (provider: any) => {
+  const library = new ethers.providers.Web3Provider(provider);
+  return library;
+};
 
 ReactDOM.render(
   <React.StrictMode>
-    {/* <Provider> */}
-      {/* <Connector /> */}
-      {/* <Game /> */}
+    <Web3ReactProvider getLibrary={getLibrary}>
       <Jigsaw />
+    </Web3ReactProvider>
+      
     {/* </Provider> */}
   </React.StrictMode>,
   document.getElementById('root')

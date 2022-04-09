@@ -154,7 +154,7 @@ function Play() {
            </div>
           </div>
           <div className="claim">
-            <button className="claim-button">Claim</button>
+            <button className="claim-button">Claim NFT</button>
           </div>
         </div>
     );

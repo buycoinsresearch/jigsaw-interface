@@ -14,10 +14,12 @@ function App() {
     <div className="App">
       <Header />
       <div className="hero">
-        <h2>Create</h2>
+        <h2>Create a Proof-of-Work NFT Puzzle game with Jigsaw</h2>
+         <h3>Create a puzzle to earn a Jigsaw token.</h3>
+          <h3>Solve jigsaw puzzles to win an NFT.</h3>
         <span className="buttons">
-        <button><a href={window.location.href + 'create'}>Create NFT</a></button>
-        <button><a href={window.location.href + 'games'}>View NFTs</a></button>
+        <button><a href={window.location.href + 'create'}>Create Puzzle</a></button>
+        <button><a href={window.location.href + 'games'}>Solve Puzzles</a></button>
         </span>
       </div>
     </div>

@@ -92,7 +92,7 @@ export default function Game() {
         <div className="container">
             <Header />
             <div className="games">
-                <h2>Active Games</h2>
+                <h2>Active Puzzles</h2>
                 <Carousel responsive={responsive} >
                     {valid!.map((game, index) => (
                         <div className="game" key={index}>
@@ -108,7 +108,7 @@ export default function Game() {
                 </div>  */}
             </div>
             <div className="games">
-                <h2>Inactive Games</h2>
+                <h2>Solved Puzzles</h2>
                 <Carousel responsive={responsive} >
                     {invalid!.map((game, index) => (
                         <div className="game" key={index}>

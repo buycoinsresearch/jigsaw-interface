@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import logo from '../jigsaws.png';
-import jigsaw from '../jigsaw.png';
 import { ethers } from 'ethers';
-import detectEthereumProvider from '@metamask/detect-provider';
+import detectEthereumProvider from '@metamask/detect-provider';import { useWeb3React } from '@web3-react/core'
+import { injected, CoinbaseWallet, WalletConnect } from './WalletConnect';
 
 function Header() {
     const [address, setAddress] = useState('');
     const [home, setHome] = useState('');
+    const { active, activate, deactivate, library, chainId, account } = useWeb3React();
 
     async function connect() {
         const provider = await detectEthereumProvider();
@@ -16,7 +17,7 @@ function Header() {
             })
             setAddress(accounts[0]);
             window.localStorage.setItem('address', accounts[0]);
-        }
+        } 
     }
 
     useEffect(() => {
@@ -35,7 +36,14 @@ function Header() {
     }, [address])
 
     return (
-        <div className="App-header">
+        <div className="App-header">{account 
+                ? <button onClick={() => deactivate()}>Disconnect</button> 
+                : <button onClick={() => {
+                    activate(WalletConnect, undefined, true)
+                    .then((resp) => console.log(resp))
+                    .catch((err) => console.log(err))
+                }}>Connect</button>
+            }
         <a href={home}><img src={logo} className="App-logo" alt="logo" /></a>
         <button id="connect-wallet" onClick={connect}>Connect wallet</button>
         </div>
