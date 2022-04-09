@@ -5,6 +5,7 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import WalletConnect from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+global.Buffer = global.Buffer || require('buffer').Buffer;
 
 function Header() {
     const [address, setAddress] = useState('');
@@ -29,6 +30,7 @@ function Header() {
             // Check if connection is already established
             if (!connector.connected) {
                 // create new session
+                console.log(connector)
                 connector.createSession();
             }
         }
