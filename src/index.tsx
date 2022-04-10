@@ -6,6 +6,11 @@ import Jigsaw from './route';
 
 ReactDOM.render(
   <React.StrictMode>
+      {/* <meta name="twitter:card" content="Create a Proof-of-Work NFT Puzzle game with Jigsaw" /> */}
+      <meta name="twitter:site" content="Jigsaw" />
+      <meta name="og:title" content="Jigsaw" />
+      <meta name="og:description" content="Create a Proof-of-Work NFT Puzzle game with Jigsaw" />
+      <meta name="og:image" content="../public/jigsaws.png" />
       <Jigsaw />
   </React.StrictMode>,
   document.getElementById('root')
