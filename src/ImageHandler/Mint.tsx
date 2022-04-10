@@ -10,6 +10,8 @@ import { create } from 'ipfs-http-client';
 import { Buffer } from 'buffer';
 import { useModal } from 'react-hooks-use-modal';
 import Header from '../Homepage/Header';
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
 
 const contractAddress = '0xcE85907b8962D1b908747f7A100fA947934812a2';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
@@ -37,6 +39,11 @@ function Create() {
 
     const mint = document.getElementById('mint') as HTMLInputElement;
 
+    const connector = new WalletConnect({
+        bridge: "https://bridge.walletconnect.org", // Required
+        qrcodeModal: QRCodeModal,
+    });
+
     function toHexString(byteArray: Uint8Array) {
         return Array.from(byteArray, function(byte) {
           return ('0' + (byte & 0xFF).toString(16)).slice(-2);
@@ -45,7 +52,6 @@ function Create() {
 
     useEffect(() => {
         if (nft !== undefined && nftURL !== undefined) {
-            console.log("here1")
             MintF(nft!, nftURL!);
         }
     }, [nft, nftURL])
@@ -74,7 +80,7 @@ function Create() {
           const address: string = await window.ethereum.request({
             method: 'eth_requestAccounts',
           })
-          console.log(hash, hexString, buffer);
+        //   console.log(hash, hexString, buffer);
 
           await window.ethereum.request({
             method: 'eth_sendTransaction' as any,
@@ -85,6 +91,30 @@ function Create() {
             }] as any,
           })
         
+        } else {
+            if (!connector.connected) {
+                await connector.createSession();
+            }
+            const session = window.localStorage.getItem('walletconnect');
+            const parsedSession = JSON.parse(session!);
+            const address = parsedSession.accounts[0];
+            const tx = {
+                from: address,
+                to: contractAddress,
+                data: encodedData,
+            }
+            //Send transaction
+            await connector
+                .sendTransaction(tx)
+                .then((result) => {
+                    console.log(result);
+                    alert("Transaction sent!");
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    console.error(error);
+                    alert("Transaction failed");
+                })
         }
     }
 

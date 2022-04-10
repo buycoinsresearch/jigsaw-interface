@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import logo from '../jigsaws.png';
-import { ethers, providers } from 'ethers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import WalletConnect from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
@@ -24,20 +23,18 @@ function Header() {
             })
             setAddress(accounts[0]);
             window.localStorage.setItem('address', accounts[0]);
-        } else {
-            
-            
+        } else { 
             // Check if connection is already established
             if (!connector.connected) {
                 // create new session
                 await connector.createSession();
-                const session = window.localStorage.getItem('walletconnect');
-                const parsedSession = JSON.parse(session!);
-                setAddress(parsedSession.accounts[0]);
-                setChainId(parsedSession.chainId);
-                
             }
 
+            const session = window.localStorage.getItem('walletconnect');
+            const parsedSession = JSON.parse(session!);
+            setAddress(parsedSession.accounts[0]);
+            setChainId(parsedSession.chainId);  
+            window.localStorage.setItem('address', parsedSession.accounts[0]);
         }
     }
 

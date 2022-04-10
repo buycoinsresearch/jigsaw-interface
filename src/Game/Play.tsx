@@ -7,12 +7,18 @@ import abi from '../JigsawABI.json';
 import { ethers, Signer } from 'ethers';
 import { create } from 'ipfs-http-client'
 import Header from '../Homepage/Header';
+import WalletConnect from "@walletconnect/client";
+import QRCodeModal from "@walletconnect/qrcode-modal";
 
 const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
 const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
 const provider = new ethers.providers.JsonRpcProvider(infuraUrl)
 const contract = new ethers.Contract(contractAddress, abi, provider);
 const client = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
+const connector = new WalletConnect({
+  bridge: "https://bridge.walletconnect.org", // Required
+  qrcodeModal: QRCodeModal,
+});
 
 function Play() {
     const [nft, setNFT] = useState<NFT[] | undefined>()
@@ -124,7 +130,31 @@ function Play() {
           }] as any,
         })
       
-      }
+      } else {
+        if (!connector.connected) {
+            await connector.createSession();
+        }
+        const session = window.localStorage.getItem('walletconnect');
+        const parsedSession = JSON.parse(session!);
+        const address = parsedSession.accounts[0];
+        const tx = {
+            from: address,
+            to: contractAddress,
+            data: encodedData,
+        }
+        //Send transaction
+        await connector
+            .sendTransaction(tx)
+            .then((result) => {
+                console.log(result);
+                alert("Transaction sent!");
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.error(error);
+                alert("Transaction failed");
+            })
+    }
     }
 
     return (
