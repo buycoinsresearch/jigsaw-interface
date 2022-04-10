@@ -62,8 +62,8 @@ function Play() {
     }, [gameImage])
 
     useEffect(() => {
-      const claimButton = document.getElementsByClassName('claim-button')[0] as HTMLButtonElement;
-      claimButton.disabled = true;
+      // const claimButton = document.getElementsByClassName('claim-button')[0] as HTMLButtonElement;
+      // claimButton.disabled = true;
       if (nft !== undefined) {
         submitSolution();
       }
@@ -75,8 +75,33 @@ function Play() {
         }).join('')
     }
 
+    async function sendWalletTransaction(encodedData: string) {
+      const session = window.localStorage.getItem('walletconnect');
+      const parsedSession = JSON.parse(session!);
+      const address = parsedSession.accounts[0];
+      const tx = {
+          from: address,
+          to: contractAddress,
+          data: encodedData,
+      }
+      setLoading(true);
+      //Send transaction
+      await connector
+          .sendTransaction(tx)
+          .then((result) => {
+              console.log(result);
+              alert("Transaction sent!");
+              setLoading(false);
+              window.location.reload();
+          })
+          .catch((error) => {
+              console.error(error);
+              alert("Transaction rejected. Please try again.");
+              setLoading(false);
+          })
+        }
+
     async function Claim() {
-        setLoading(true);
         const image = new Image();
         image.src = `${cid}`;
         
@@ -120,15 +145,20 @@ function Play() {
       
       if (window.ethereum) {
         
-        const address: string = await window.ethereum.request({
-          method: 'eth_requestAccounts',
-        })
-        //   console.log(encodedData);
-
+        if (window.localStorage.getItem("address") === "") {
+          await window.ethereum.request({
+            method: 'eth_requestAccounts',
+          })
+          .then((address) => {
+            window.localStorage.setItem('address', address[0])
+            setLoading(true);
+          })
+        }
+        
         await window.ethereum.request({
           method: 'eth_sendTransaction' as any,
           params: [{
-            from: address[0],
+            from: window.localStorage.getItem('address'),
             to: contractAddress,
             data: encodedData,
           }] as any,
@@ -147,30 +177,17 @@ function Play() {
       
       } else {
         if (!connector.connected) {
-            await connector.createSession();
-        }
-        const session = window.localStorage.getItem('walletconnect');
-        const parsedSession = JSON.parse(session!);
-        const address = parsedSession.accounts[0];
-        const tx = {
-            from: address,
-            to: contractAddress,
-            data: encodedData,
-        }
-        //Send transaction
-        await connector
-            .sendTransaction(tx)
-            .then((result) => {
-                console.log(result);
-                alert("Transaction sent!");
-                setLoading(false);
-                window.location.reload();
+            await connector.createSession()
+            .then((address) => {
+              sendWalletTransaction(encodedData);
             })
-            .catch((error) => {
-                console.error(error);
-                alert("Transaction rejected. Please try again.");
-                setLoading(false);
+            .catch((err) => {
+              alert("Failed to connect wallet")
+              setLoading(false);
             })
+        } else {
+          sendWalletTransaction(encodedData);
+        }
     }
     }
 
@@ -201,10 +218,11 @@ function Play() {
            </div>
           </div>
           <div className="claim">
-            <button className="claim-button">
+            <button className="claim-button" disabled={loading}>
               {loading && <FontAwesomeIcon icon={faSpinner} />}
               Claim NFT
               </button>
+          {loading && <h5>Open your wallet to confirm the transaction</h5>}
           </div>
         </div>
     );
