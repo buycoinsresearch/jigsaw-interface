@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Mint.css';
 import 'react-bootstrap';
-import { Confirmation } from './MintPopup'
 import { NFT } from '../Components/NFT';
 import { sha256 } from 'ethers/lib/utils';
 import abi from '.././JigsawABI.json';
@@ -12,6 +11,8 @@ import { useModal } from 'react-hooks-use-modal';
 import Header from '../Homepage/Header';
 import WalletConnect from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 const contractAddress = '0xcE85907b8962D1b908747f7A100fA947934812a2';
 const contract = new ethers.Contract(contractAddress, abi, ethers.getDefaultProvider());
@@ -34,9 +35,9 @@ function Create() {
     });
     const [Modal, open, close, isOpen] = useModal('root', {
         preventScroll: true,
-        closeOnOverlayClick: false
+        closeOnOverlayClick: true
       });
-
+    const [loading, setLoading] = useState(false);
     const mint = document.getElementById('mint') as HTMLInputElement;
 
     const connector = new WalletConnect({
@@ -89,6 +90,17 @@ function Create() {
               to: contractAddress,
               data: encodedData,
             }] as any,
+          })
+          .then((response) => {
+            alert("Transaction sent!");
+            console.log(response);
+            setLoading(false);
+            window.location.reload();
+          })
+          .catch((err) => {
+            console.log(err);
+            setLoading(false);
+            alert("Transaction failed. Please try again.");
           })
         
         } else {
@@ -151,6 +163,7 @@ function Create() {
     }
 
     const fileUpload = async () => {
+        setLoading(true);
         console.log("Uploading...");
         if(file != null) {
             // const CUD = await IpfsUpload(file);
@@ -184,11 +197,17 @@ function Create() {
     const updateDimension = () => {
         const row = document.getElementById('row') as HTMLInputElement;
         const column = document.getElementById('column') as HTMLInputElement;
-        const name = document.getElementById('name') as HTMLInputElement;
-        setDimension({
-            row: parseInt(row.value),
-            column: parseInt(column.value)
-        })
+        const re = /^[0-9\b]+$/;
+        
+        if ((re.test(row.value) || row.value === '') && (column.value === '' || re.test(column.value))) {
+            console.log("gothe")
+            setDimension({
+                row: parseInt(row.value),
+                column: parseInt(column.value)
+            })
+        } else {
+            alert("Please enter a valid number");
+        }
     }
 
     const updateDescription = () => {
@@ -212,19 +231,25 @@ function Create() {
             <input type="file" accept='image/jpg, image/jpeg' onChange={handleFileChange} /><br />
             <input type="text" placeholder="Name" id='name' onChange={updateDescription} /><br />
             <input type="text" placeholder="Description" id="description" onChange={updateDescription} /><br />
-            <input type="number" placeholder="Rows" id='row' aria-label='Name' onChange={updateDimension} /><br />
+            <input type="number" placeholder="Rows" id='row' onChange={updateDimension} /><br />
             <input type="number" placeholder="Columns" id='column' onChange={updateDimension} /><br />
             <img className="nft-image" id='nft' /><br />
             <input id='mint' type="submit" value='MINT' onClick={open} disabled={!file} />
         </div>
         <Modal>
             <div className='mintModal'>
-                <button className='close' onClick={close}>&#x2715;</button>
+                <button className='close' onClick={() => {
+                    setLoading(false)
+                    close();
+                }}>&#x2715;</button>
                 <img className="modal-image" id='nft' src={src} /><br />
                 <p>Name: {description.name}</p>
                 <p>Description: {description.description}</p>
                 <p>Dimension: {dimension.row} x {dimension.column}</p>
-                <button onClick={fileUpload}>Continue</button>
+                <button onClick={fileUpload} disabled={loading}>
+                    {loading && <FontAwesomeIcon icon={faSpinner} />}
+                    Continue
+                </button>
             </div>
         </Modal>
     

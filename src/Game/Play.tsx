@@ -9,6 +9,8 @@ import { create } from 'ipfs-http-client'
 import Header from '../Homepage/Header';
 import WalletConnect from "@walletconnect/client";
 import QRCodeModal from "@walletconnect/qrcode-modal";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
 const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
@@ -31,6 +33,7 @@ function Play() {
         column: 0,
     })
     const [imageSize, setImageSize] = useState<{ width: number, height: number }>()
+    const [loading, setLoading] = useState(false);
     var cid: string = "";
 
     async function getNFT() {
@@ -73,6 +76,7 @@ function Play() {
     }
 
     async function Claim() {
+        setLoading(true);
         const image = new Image();
         image.src = `${cid}`;
         
@@ -129,6 +133,17 @@ function Play() {
             data: encodedData,
           }] as any,
         })
+        .then((response) => {
+          alert("Transaction sent!");
+          console.log(response);
+          setLoading(false);
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          alert("Transaction rejected. Please try again.");
+        })
       
       } else {
         if (!connector.connected) {
@@ -148,11 +163,13 @@ function Play() {
             .then((result) => {
                 console.log(result);
                 alert("Transaction sent!");
+                setLoading(false);
                 window.location.reload();
             })
             .catch((error) => {
                 console.error(error);
-                alert("Transaction failed");
+                alert("Transaction rejected. Please try again.");
+                setLoading(false);
             })
     }
     }
@@ -184,7 +201,10 @@ function Play() {
            </div>
           </div>
           <div className="claim">
-            <button className="claim-button">Claim NFT</button>
+            <button className="claim-button">
+              {loading && <FontAwesomeIcon icon={faSpinner} />}
+              Claim NFT
+              </button>
           </div>
         </div>
     );

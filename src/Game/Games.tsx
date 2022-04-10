@@ -5,6 +5,7 @@ import 'react-multi-carousel/lib/styles.css';
 import { ethers } from 'ethers';
 import { useState, useEffect } from 'react';
 import Header from '../Homepage/Header';
+import { BallTriangle } from 'react-loader-spinner';
 
 const contractAddress = "0xcE85907b8962D1b908747f7A100fA947934812a2"
 const infuraUrl = `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_ID}`
@@ -16,6 +17,7 @@ export default function Game() {
     const [invalid, setInvalid] = useState<{src: string, name: string, description: string}[]>([]);
     const [validUriIndex, setValidUriIndex] = useState(0);
     const [invalidUriIndex, setInvalidUriIndex] = useState(0);
+    const [loading, setLoading] = useState<boolean>()
 
     async function getNFT(metadataUrl: string, tokenId: number) {
         const metadata = await (await fetch(metadataUrl)).json();
@@ -53,6 +55,9 @@ export default function Game() {
                 }
             }
             total--;
+            if (validIndex > 0 && invalidIndex > 0) {
+                setLoading(false);
+            }
         }
     }
 
@@ -63,6 +68,7 @@ export default function Game() {
     }
 
     useEffect(() => {
+        setLoading(true);
         getGames()
     }, [])
 
@@ -107,6 +113,17 @@ export default function Game() {
                     <button className='games-button'><a href='#'>See more</a></button>
                 </div>  */}
             </div>
+            {loading && <div
+                style={{
+                width: "100%",
+                height: "100",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+                }}
+                >
+                <BallTriangle color="#ec5990" height="100" width="100" />
+            </div>}
             <div className="games">
                 <h2>Solved Puzzles</h2>
                 <Carousel responsive={responsive} >
