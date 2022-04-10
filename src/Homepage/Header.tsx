@@ -99,6 +99,7 @@ function Header() {
         if (connector.connected) {
             window.localStorage.setItem('walletconnect', "");
         } 
+        alert("wallet disconnected")
         window.location.reload();
     }
 
@@ -106,7 +107,8 @@ function Header() {
         <div className="App-header">
         <a href={home}><img src={logo} className="App-logo" alt="logo" /></a>
         <button id="connect-wallet" onClick={connect}>Connect wallet</button>
-        <button id="connect-wallet" onClick={disconnect}>&times;</button>
+        {address !== "" && 
+        <button id="connect-wallet" onClick={disconnect}>&times;</button>}
         </div>
     )
 }
