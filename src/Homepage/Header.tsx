@@ -93,10 +93,20 @@ function Header() {
         }
     }, [chainId])
 
+    async function disconnect() {
+        setAddress("");
+        window.localStorage.setItem('address', "");
+        if (connector.connected) {
+            window.localStorage.setItem('walletconnect', "");
+        } 
+        window.location.reload();
+    }
+
     return (
         <div className="App-header">
         <a href={home}><img src={logo} className="App-logo" alt="logo" /></a>
         <button id="connect-wallet" onClick={connect}>Connect wallet</button>
+        <button id="connect-wallet" onClick={disconnect}>&times;</button>
         </div>
     )
 }

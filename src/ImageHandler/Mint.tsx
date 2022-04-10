@@ -35,7 +35,7 @@ function Create() {
     });
     const [Modal, open, close, isOpen] = useModal('root', {
         preventScroll: true,
-        closeOnOverlayClick: true
+        closeOnOverlayClick: false
       });
     const [loading, setLoading] = useState(false);
     const mint = document.getElementById('mint') as HTMLInputElement;
@@ -121,11 +121,13 @@ function Create() {
                 .then((result) => {
                     console.log(result);
                     alert("Transaction sent!");
+                    setLoading(false);
                     window.location.reload();
                 })
                 .catch((error) => {
                     console.error(error);
                     alert("Transaction failed");
+                    setLoading(false);
                 })
         }
     }
@@ -200,7 +202,6 @@ function Create() {
         const re = /^[0-9\b]+$/;
         
         if ((re.test(row.value) || row.value === '') && (column.value === '' || re.test(column.value))) {
-            console.log("gothe")
             setDimension({
                 row: parseInt(row.value),
                 column: parseInt(column.value)
@@ -238,10 +239,11 @@ function Create() {
         </div>
         <Modal>
             <div className='mintModal'>
+                {!loading && 
                 <button className='close' onClick={() => {
                     setLoading(false)
                     close();
-                }}>&#x2715;</button>
+                }}>&#x2715;</button>}
                 <img className="modal-image" id='nft' src={src} /><br />
                 <p>Name: {description.name}</p>
                 <p>Description: {description.description}</p>
@@ -250,6 +252,7 @@ function Create() {
                     {loading && <FontAwesomeIcon icon={faSpinner} />}
                     Continue
                 </button>
+                {loading && <h5>Open your wallet to confirm the transaction</h5>}
             </div>
         </Modal>
     
