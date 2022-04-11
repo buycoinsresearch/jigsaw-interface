@@ -104,7 +104,7 @@ export default function Game() {
                         <div className="game" key={index}>
                             <img src={game.src} alt="" />
                             <h3>{(game.name).slice(0, 15)}</h3>
-                            <p>{(game.description).slice(0, 120)}</p>
+                            <p className="game-description">{(game.description).slice(0, 80)}</p>
                             <button onClick={() => {playGame(index)}}>Play</button>
                         </div>
                     ))}   
@@ -131,7 +131,7 @@ export default function Game() {
                         <div className="game" key={index}>
                             <img src={game.src} alt="" />
                             <h3>{game.name}</h3>
-                            <p>{game.description}</p>
+                            <p className="game-description">{game.description}</p>
                         </div>
                     ))}
                     {/* <div>
