@@ -124,3 +124,9 @@ button:hover {
   font-weight: bold;
   text-decoration: none;
 }
+
+@media only screen and (max-width: 768px) {
+  .about {
+    max-width: 90%;
+  }
+}
